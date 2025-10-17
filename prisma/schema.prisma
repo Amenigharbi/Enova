@@ -1,0 +1,67 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  username String   @unique
+  password String
+  email    String   @unique
+  name     String?
+  role     String   @default("USER")
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
+
+model Domain {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String?
+  slug        String   @unique
+  icon        String?
+  robots      Robot[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("domains")
+}
+
+model Robot {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String?
+  slug        String   @unique
+  githubRepo  String
+  
+  // Spécifications techniques
+  cpu          String?
+  gpu          String?
+  ram          String?
+  storage      String?
+  os           String?
+  connectivity String?
+  power        String?
+  weight       String?
+  dimensions   String?
+  
+  domainId String   @db.ObjectId
+  domain   Domain   @relation(fields: [domainId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("robots")
+}
+enum UserRole {
+  USER
+  ADMIN
+}
